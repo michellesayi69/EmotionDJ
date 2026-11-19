@@ -280,6 +280,14 @@ fun MainScreen(
                 onPrevious = viewModel::previousTrack,
                 onSeek = viewModel::seekTo,
             )
+            
+            TextButton(
+                onClick = { viewModel.openSpotifyForCurrentMood() },
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Text("Search this mood on Spotify", color = Color.White)
+            }
+
         }
 
         // Floating voice button (optional)
