@@ -1,163 +1,58 @@
-# EmotionDJ — AI Emotion-Based Playlist Generator
+# EmotionDJ 🎵🧠
 
-[![License: 
-MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.9+-blue.svg)](https://kotlinlang.org/)
-[![Android](https://img.shields.io/badge/Android-API%2024+-brightgreen.svg)](https://developer.android.com/)
-[![Jetpack 
-Compose](https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4.svg)](https://developer.android.com/jetpack/compose)
+**EmotionDJ** is an Android application that detects a user's facial expression using on-device machine learning and curates a local music playlist to match their mood. 
 
-An Android application that detects a user's emotional state through 
-facial expression analysis and dynamically generates a personalised music 
-playlist to match or enhance that mood. All inference runs on-device, with 
-no network calls required for emotion detection.
+Built as a Computer Science portfolio project to demonstrate modern Android architecture, on-device ML integration, and audio lifecycle management.
 
----
+## 📱 Core Features
 
-## Overview
+*   **Real-time Emotion Detection:** Uses CameraX and Google ML Kit to analyze facial attributes (smiling probability, eye openness) via the front-facing camera.
+*   **Local Mood-Based Playback:** Automatically maps detected moods to local audio tracks using `MediaPlayer`.
+*   **Audio Focus Management:** Gracefully handles interruptions (pauses when a phone call or YouTube Music starts, resumes when finished).
+*   **Playback Controls:** A custom Jetpack Compose UI (`MusicBar`) providing play, pause, skip, and seek functionality.
+*   **Manual Spotify Hand-off:** A dedicated button pauses local music and safely hands off to the Spotify app for a specific artist.
+*   **Mood History:** Stores past moods locally using Room Database.
 
-EmotionDJ bridges on-device machine learning with audio playback to create 
-a mood-aware listening experience. The app uses the device camera to 
-capture a facial expression, runs emotion classification locally, and maps 
-the detected emotion to a curated playlist. The interface is built 
-entirely in Jetpack Compose and follows the MVVM architecture pattern.
+## 🏗️ Architecture & Tech Stack
 
-The project includes offline-first design, text-to-speech narration, voice 
-input, haptic feedback, and a demonstration mode for presentations.
+*   **Language:** Kotlin
+*   **UI:** Jetpack Compose (Material 3)
+*   **Architecture:** MVVM (Model-View-ViewModel) + Repository Pattern
+*   **Machine Learning:** Google ML Kit (Face Detection)
+*   **Async Programming:** Kotlin Coroutines & StateFlow
+*   **Local Storage:** Room (SQLite)
+*   **Audio:** Android `MediaPlayer` API, `AudioManager` (Audio Focus)
+*   **Camera:** CameraX
 
----
+### How the Playback Pipeline Works
+1. `CameraHelper` binds CameraX and passes frames to ML Kit.
+2. `MoodDetector` parses ML Kit's facial attributes and determines a mood.
+3. `MainViewModel` receives the mood, updates the UI, and triggers the `MusicPlayer`.
+4. `MusicPlayer` requests Audio Focus, loads the matching queue from `MoodCatalog`, and begins playback.
 
-## Features
+## 🚦 Honest Feature Status
 
-- **Real-time emotion detection** — Classifies facial expressions into 
-emotion categories using an on-device model.
-- **Automatic playlist generation** — Maps detected emotion to a curated 
-playlist.
-- **Manual mood selection** — Users can override camera detection and 
-choose a mood manually.
-- **Room database history** — Every mood detection is timestamped and 
-stored locally for the user's mood history.
-- **Statistics screen** — Displays mood trends over time.
-- **Text-to-speech narration** — Announces the detected mood and playlist.
-- **Voice input** — Users can speak their mood as an alternative to camera 
-scanning.
-- **Offline mode** — Warns the user when offline and continues functioning 
-with local data.
-- **Demo mode** — Useful for presentations, hides sensitive UI elements 
-and simulates detections.
-- **Full playback controls** — Play, pause, skip, and seek within tracks.
-- **Haptic feedback** — Tactile response on detection and interaction.
-- **Artist personalisation** — Tracks user preferences and adjusts 
-playlist recommendations.
-- **Notification reminders** — Periodic mood check-ins via local 
-notifications.
-- **Tutorial onboarding** — First-launch walkthrough for new users.
+In the spirit of engineering transparency, here is the exact status of the project's features:
 
----
+| Feature | Status | Notes |
+| :--- | :--- | :--- |
+| Camera Mood Detection | ✅ Implemented | Uses ML Kit attributes + custom thresholds. |
+| Local Music Playback | ✅ Implemented | Full queue, skip, seek, audio focus. |
+| Spotify Hand-off | ✅ Implemented | Manual trigger to avoid interrupting local audio. |
+| Mood History (Room) | ✅ Implemented | Saves and displays past moods. |
+| Voice Input | 🟡 Partial | RecognizerIntent is wired, but end-to-end UX needs polish. |
+| Statistics/Trends | ❌ Planned | DAO currently exposes only raw history. |
+| Background Service | ❌ Planned | Playback lives in ViewModel; foreground service is next. |
 
-## Architecture
-┌────────────────────────────────────────────────────────────────┐
-│ EmotionDJ Pipeline │
-├────────────────────────────────────────────────────────────────┤
-│ │
-│ [ CameraX Preview ] │
-│ ↓ │
-│ [ Face Detection + Emotion Classification ] │
-│ ↓ │
-│ Detected emotion → happy / sad / energetic / relaxed │
-│ ↓ │
-│ [ Playlist Mapper ] │
-│ ↓ │
-│ [ MediaPlayer + Playback UI ] │
-│ │
-│ Side flows: │
-│ • Mood history → Room database → Stats screen │
-│ • TTS + Voice → accessibility layer │
-│ • Notifications → periodic reminders │
-│ │
-└────────────────────────────────────────────────────────────────┘**Package 
-structure:**
+## ⚠️ Disclaimer
+EmotionDJ is an **experimental** academic project. Facial expressions are an unreliable proxy for actual emotional state. This application is **not** intended for clinical or psychological assessment. 
 
-- `MainActivity.kt` — entry point
-- `EmotionDJApplication.kt` — application class
-- `viewmodel/` — MainViewModel, SettingsViewModel, HistoryViewModel
-- `ui/screens/` — Splash, Tutorial, Main, History, Settings, Stats
-- `ui/components/` — MoodBadge, PlaylistCard, OfflineWarningBanner, 
-ScanningAnimation, FloatingReturnButton
-- `ui/theme/` — Color, Theme, Type
-- `data/` — Room database, DAO, repository, entity, type converters
-- `utils/` — CameraHelper, MoodDetector, MoodHistoryManager, 
-NotificationHelper, SoundPlayer, TTSHelper, VoiceHelper, HapticHelper, 
-ConnectivityHelper, ArtistPreferenceManager, DemoMode, ThrottleManager
+## 🚀 How to Build and Run
 
----
+1. Clone the repository.
+2. Ensure you have Android Studio and JDK 17+ installed.
+3. Create a `local.properties` file in the root directory with your SDK path: `sdk.dir=/path/to/your/Android/sdk`.
+4. Build via terminal: `./gradlew assembleDebug`
+5. Install to a connected device/emulator: `./gradlew installDebug`
 
-## Tech Stack
-
-| Layer | Technology |
-|-------|------------|
-| Language | Kotlin |
-| UI | Jetpack Compose (Material 3) |
-| Camera | CameraX |
-| On-device detection | Custom MoodDetector module |
-| Local database | Room (SQLite) |
-| Audio playback | Android MediaPlayer |
-| Text-to-speech | Android TTS API |
-| Voice input | Android SpeechRecognizer |
-| Architecture | MVVM + Repository |
-| Async | Kotlin Coroutines + Flow |
-| Build | Gradle (Kotlin DSL) |
-
----
-
-## Setup Instructions
-
-### Prerequisites
-
-- Android Studio (latest version)
-- JDK 17 or higher
-- Android device or emulator running API 24 or higher
-
-### Steps
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/michellesayi69/EmotionDJ.git
-   cd EmotionDJ
-Open the project in Android Studio.
-Sync Gradle (Android Studio will prompt you).
-Connect a device or start an emulator.
-Click Run in Android Studio.
-Grant camera permission when prompted — this is required for facial 
-emotion detection.
-If the app is offline, the Offline Warning Banner appears and a demo mode 
-is available.
-Known Limitations
-
-Emotion detection accuracy depends on lighting, camera angle, and face 
-visibility. Best results in well-lit environments with a clear frontal 
-view.
-The classifier recognises a limited set of emotion categories. It is not 
-intended for clinical or psychological assessment.
-Audio files must be provided by the user and placed in 
-app/src/main/res/raw/ — the app does not stream from external music 
-services.
-Voice input requires an active network connection for speech recognition 
-in some Android versions.
-Future Improvements
-
-Streaming service integration (Spotify, Apple Music) via public APIs
-Multi-face detection for group mood analysis
-Personalised mood-to-playlist mapping learned over time
-Background playback with a foreground service
-Wear OS companion app
-License
-
-This project is licensed under the MIT License — see the LICENSE file for 
-details.
-
-Author
-
-Michelle Sayi — GitHub
-
-This project was originally developed as an academic submission (2026).
+*(Note: The `res/raw/` folder currently contains 5-second sine-wave stubs for pipeline testing. Replace them with licensed audio tracks for a production build.)*
