@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.emotiondj.ui.components.MusicBar
 import com.example.emotiondj.ui.components.OfflineWarningBanner
 import com.example.emotiondj.utils.*
 import com.example.emotiondj.viewmodel.MainViewModel
@@ -268,6 +269,17 @@ fun MainScreen(
                     Text("No internet connection. Playlist unavailable.", modifier = Modifier.padding(12.dp))
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            val playback by viewModel.playback.collectAsState()
+            MusicBar(
+                state = playback,
+                onToggle = viewModel::togglePlayback,
+                onNext = viewModel::nextTrack,
+                onPrevious = viewModel::previousTrack,
+                onSeek = viewModel::seekTo,
+            )
         }
 
         // Floating voice button (optional)
